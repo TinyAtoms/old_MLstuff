@@ -127,10 +127,193 @@ There are 3 classical approaches available:
 **Backward selection cannot be used if p > n, while forward selection can always be used. Forward selection is a greedy approach, and might include variables early that later become redundant. Mixed selection can remedy this.**
 
 ### How well does the model fit the data?
-
+Two of the most common numerical measures of model fit are the RSE and $R^2$. 
+$R^2$ close to one is desirable. We can compare models with x1,x2,x3 and x1,2,3,4 and look at the increase in $R^2$ If the increase is small, it supports the fact that we can drop x4. There's also RSE to consider. Read the section again at some other date, because you're still not certain how to use it.
+We can also plot the data.  Graphical summaries can reveal problems
+with a model that are not visible from numerical statistics. 
+It can reveal *synergistic/interactive effects* (where predictors have effects on each other). We'll deal with extending linear models to acomodate for this later on. 
 
 
 ### Given a set of predictor values, what response value should we predict, and how accurate is our prediction?
+
+Once we have our model, it's straightforward to get predictions from it. But there are 3 kinds of uncertainty associated with our predictions:
+1. The coefficients are estimates, so the least square plane is an estimate to the *true population regression plane*.. This is related to the reducable error. We can compute a confidence interval in order to determine how close Ŷ will be to f (X)
+2. Our model is an approximation of reality, an additional uncertaincy will be created in the form of bias. 
+3. Even if we had the exact coefficients, we still have the irreducable error $\epsilon$. We use prediction intervals to see how far predicted Y will differ from Y. 
+
+We use a **confidence interval** to quantify the uncertainty surrounding  the average sales over a large number of cities.   On the other hand, a **prediction interval** can be used to quantify the prediction uncertainty surrounding sales for a particular city. The prediction interval is substantially wider than the confidence interval, reflecting the increased uncertainty.
+
+## 3.3 Other considerations in the regression model
+
+### 3.3.1 Qualitative predictors
+So far, we assumed our predictors are quantitative, which aint the case always. 
+
+### 2level qualitative
+We simply create a numerical dummy category and assign the categories 0 or 1.
+
+## 2+ level qualitative
+If we have something like ethnicity: caucasian, black, asian, etc
+we could create multiplle dummy variables
+caucasian 0 1
+asian 0 1
+black 0 1
+etc
+There are other equally valid methods
+
+## 3.3.2 Extension of the linear regression model
+
+There are a number of assumptions with the standard linear regression model.  Two of the most important assumptions state that the relationship between the predictors and response are additive (that predictors don't interact) and linear(for every increase of Xj, that there's a Bj increase).  There are a  number of sophisticated methods that relax these two assumptions. Here, we briefly examine some common classical approaches for extending the linear model
+
+### Removing the additive assumption
+
+Falling back on sales with predictors radio, tv and newspaper sales:
+One way of extending this model to allow for interaction effects is to include a third predictor, called an interaction term, which is constructed by computing the product of X1 and X2 . This results in the model
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 \beta_3 X_1 X_2 + \epsilon = 
+\beta_0 + (\beta_1 + \beta_3 X_2) X_1 + \beta_2 X_2 + \epsilon 
+$$
+We'll call $(\beta_1 + \beta_3 X_2)$ $\tilde{\beta_1}$ or interaction term
+
+We can see in table 3.9 that the p-value of the interaction term is very low, so there is strong evidence to suggest there is a relation.
+In this example, both X1, X2 and X1 X2 have small p-values, suggesting all 3 should be included in the model.
+However, it is sometimes the case that an interaction term has a very small p-value, but the associated main effects (in this case, TV and radio) do not. **The hierarchical principle states that if we include an interaction in a model, we should also include the main effects, even if the p-values associated with principle their coefficients are not significant.**
+
+### Non-linear Relationships
+
+Here we present a very simple way to directly extend the linear model to accommodate non-linear relationships, using polynomial regression. We'll present more complex methods later. 
+
+Take the example of miles per gallon with horsepower as predictor
+![](ISLR/pics/ch3-9.png)
+We clearly see a relationship, but we also see it's nonlinear. 
+Now, the model looks like 
+$$
+Y = \beta_0 + \beta_1 hp + \beta_2 hp^2
+$$
+Again, we should look at the $R^2$ values, and we see improvement with adding the squared hp, but no additional benefit to adding more polynomals.
+
+## 3.3.3 Potential problems
+
+When we fit a lin. regression model to a dataset, many problems may occur, such as
+
+1. Non-linearity of the response-predictor relationships.
+2. Correlation of error terms.
+3. Non-constant variance of error terms.
+4. Outliers.
+5. High-leverage points.
+6. Collinearity.
+
+In practice, identifying and overcoming these problems is as much an
+art as a science. We'll only provide some key points, but remember that entire books have been written on this point.
+
+### Nonlinearity of the data
+if the relationship between predictors and response is far from linear, all conclusions drawn from a fitted linear regression model with this data are suspect. **Residual plots** are a great way to check for nonlinearity. 
+we simply plot 
+$$e_i = y_i = \hat{y_i}$$
+and if we spot a pattern (Especially a clear U shape), they may be problems with the model, and hints that the problem isn't linear. 
+
+If we spot a nonlinear problems, we can include nonlinear transformations such as log x, x^2, sqrt(X) to the model. We'll discus more advanced approaches later.
+
+### 2. Correlation of Error Terms
+we made the assumption that $\epsilon_0, \ldots, \epsilon_n$ are not correlated. The standard errors calculated are certainly based on that assumption. But if there is correlation, the estimated standard errors  will underestimate the true standard errors. Confidence and prediction intervals will be smaller than they should be. p-values will be lower. We may falsely conclude that a predictor is statistically significant. 
+![](ISLR/pics/ch3-10.png)
+![](ISLR/pics/ch3-11.png)
+There are many different methods to take into account the correlation of error terms in time series data. But it can certainly happen outside of time series data. 
+**In general, the assumption of uncorrelated errors is extremely important for linear regression as well as for other statistical methods, and good experimental design is crucial in order to mitigate the risk of such correlations.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 3. Non-constant Variance of Error Terms
+
+Another important assumption is that the errors have a constant variance. The std, confidence intervals, and hypothesis tests associated with the linear model rely on it.  Unfortunately, it often isn't the case. An example is if the variance increases as Y does.
+
+One can identify non-constant variances in
+the errors, or **heteroscedasticity**, from the presence of a funnel shape in the residual plot.  When faced with this problem, one possible solution is to transform the response Y using a concave function such as log Y or sqrt(Y). If instead the error decreases, we could maybe use Y^2. Such a transformation results in a greater amount of shrinkage of the larger responses, leading to a reduction in heteroscedasticity. 
+![](ISLR/pics/ch3-12.png)
+
+
+
+
+Sometimes we have a good idea of the variance of each response. For
+example, the ith response could be an average of ni raw observations. If
+each of these raw observations is uncorrelated with variance σ 2 , then their average has variance σi 2 = σ 2 /ni. In this case a simple remedy is to fit our model by **weighted least squares**, with weights proportional to the inverse weighted variances—i.e. wi = ni in this case. Most linear regression software allows for observation weights.
+
+
+
+### Outliers
+if Yi is far from predicted Yi. They arise from various causes, such as incorrect recording of data. 
+It is typical for an outlier that does not have an unusual
+predictor value to have little effect on the least squares fit. However, even if an outlier does not have much effect on the least squares fit, it can cause other problems. For instance, in this example, the RSE is 1.09 when the outlier is included in the regression, but it is only 0.77 when the outlier is removed. Since the RSE is used to compute all confidence intervals and p-values, such a dramatic increase caused by a single data point can have implications for the interpretation of the fit. Similarly, inclusion of the outlier causes the R2 to decline from 0.892 to 0.805.
+![](ISLR/pics/ch3-13.png)
+Residual plots can be used to identify outliers. But in practice, it can be difficult to decide how large a residual needs to be before we consider the point to be an outlier. To address this problem, instead of plotting the residuals, we can plot the **studentized residuals**, computed by dividing each residual ei by its estimated error. Observations whose studentized residuals are greater than 3 in absolute value are possible outliers.
+
+If we believe that an outlier has occurred due to an error in data collection or recording, then one solution is to simply remove the observation. However, care should be taken, since an outlier may instead indicate a deficiency with the model, such as a missing predictor.
+
+
+### 5. High Leverage Points
+
+This is kinda the reverse of an outlier. Instead of having a unusual Y for an X, observations with **high leverage** have an unusual X. 
+![](ISLR/pics/ch3-14.png)
+
+High leverage observations tend to have a sizable impact on the estimated regression line. It is cause for concern if the least squares line is heavily affected by just a couple of observations, because any problems with these points may invalidate the entire fit. 
+
+In a simple linear regression, high leverage observations are fairly easy to identify, since we can simply look for observations for which the predictor value is outside of the normal range of the observations. But in a multiple linear regression with many predictors, it is possible to have an observation that is well within the range of each individual predictor’s values, but that is unusual in terms of the full set of predictors. We can see an example in 3.13 center. 
+
+In order to quantify an observation’s leverage, we compute the leverage
+statistic. 
+
+
+
+
+![](ISLR/pics/ch3-15.png)
+
+There is a simple extension of hi to the case of multiple predictors, though we do not provide the formula here. The leverage statistic hi is always between 1/n and 1, and the average leverage for all the observations is always equal to (p + 1)/n. So if a given observation has a leverage statistic that greatly exceeds (p+ 1)/n, then we may suspect that the corresponding point has high leverage.
+
+Beware of observations with very high leverage statistic as well as a
+high studentized residual. A dangerous combo. 
+
+### 6. Colinearity
+This refers to when 2 or more variables are closely related/dependent.  The presence of collinearity can pose problems in the regression context, since it can be difficult to separate out the individual effects of collinear variables on the response.
+
+The left-hand panel of Figure 3.15 is a contour plot of the RSS (3.22)
+associated with different possible coefficient estimates for the regression of balance on limit and age . 
+
+![](ISLR/pics/ch3-16.png)
+
+**Blah blagh GO READ THE TEXT AGAIN**
+This results in a great deal of uncertainty in the
+coefficient estimates. 
+
+Since collinearity reduces the accuracy of the estimates of the regression coefficients, it causes the standard error for β̂j to grow. Recall that the t-statistic for each predictor is calculated by dividing β̂j by its standard error. Consequently, collinearity results in a decline in the t-statistic. As a result, in the presence of collinearity, we may fail to reject H0 : βj = 0. This means that the power of the hypothesis test—the probability of correctly  detecting a non-zero coefficient—is reduced by collinearity.
+
+In other words,  In other words, the importance of colinear variables are masked due to the presence of collinearity.
+A simple way to detect collinearity is to look at the correlation matrix
+of the predictors.
+Unfortunately, not all collinearity problems can be detected by inspection of the correlation matrix: it is possible for collinearity to exist between three or more variables even if no pair of variables
+has a particularly high correlation. We call this situation **multicollinearity**. 
+
+A better way to assess multicollinearity is to compute the **variance inflation factor** (VIF). The VIF is  the ratio of the variance of β̂j when fitting the full model divided by the variance of β̂j if fit on its own. The smallest possible value for VIF is 1, which indicates the complete absence of collinearity. Typically in practice there is a small amount of collinearity among the predictors. Good rule of thumb: **VIF > 5 or 10 = BAD!!**
+
+![](ISLR/pics/ch3-17.png)
+
+When faced with the problem of collinearity, there are two simple solu-
+tions. The first is to drop one of the problematic variables from the regression. This isn't a huge loss, because colinearity indicates that one of them is redundant in the presence of the other variable(s).
+The second solution is to combine the collinear variables together into a single predictor. For instance, we might take the average of standardized versions of limit and rating in order to create a new variable that measures credit worthiness.
+
+## 3.4 The marketing plan
+Go read it again, it's just an answer of the questions asked at the start of the chapter about a particular dataset, answered with the concepts introduced so far. 
+
+
 
 
 
