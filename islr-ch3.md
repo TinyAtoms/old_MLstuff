@@ -314,6 +314,26 @@ The second solution is to combine the collinear variables together into a single
 Go read it again, it's just an answer of the questions asked at the start of the chapter about a particular dataset, answered with the concepts introduced so far. 
 
 
+## 3.5 Comparison with K nearest neighbours (KNN)
+Linear regression is a parametric approach, because it makes an assumption about the form of Y. TThese approaches have advantages, such as ease of fitting, ease of interpreting, etx. Recall the disadvantages too. if the assumed form is far removed from reality, it makes a poor predictor. We'll take a look at one of the simplest and best known nonparametric approaches, K-nearest neighbours.
+KNN regression is closely related to KNN classification. The predicted response for a set of predictors is the average of the $\mathcal{N}$ nearest neighbours.  In general, the optimal value for K will depend on the bias-variance tradeoff. 
+
+Where will least squares linear regression outperform KNN?
+**the parametric approach will outperform the nonparametric approach if the parametric form that has been selected is close to the true form of f**.
+In this case, a non-parametric approach incurs a cost in variance
+that is not offset by a reduction in bias.
+
+In a real life situation in which the true relationship is unknown, one might draw the conclusion that KNN should be favored over linear regression because it will at worst be slightly inferior than linear regression if the true relationship is linear, and may give substantially better results if the true relationship is non-linear.
+But in reality, even when the true relationship is highly non-linear, KNN may still provide inferior results to linear regression. In higher
+dimensions, KNN often performs worse than linear regression.
+This decrease in performance as the dimension increases is a common
+problem for KNN, and results from the fact that in higher dimensions
+there is effectively a reduction in sample size.
+As a general rule, parametric methods will tend to outperform non-parametric approaches when there is a small number of observations per predictor.
+
+
+
+
 
 
 
